@@ -130,6 +130,9 @@
   .modetoggle button{font-family:'Fredoka','Nunito',sans-serif; font-size:13px; letter-spacing:1px; padding:7px 16px; border-radius:8px;
     background:transparent; color:var(--ice); border:1px solid rgba(212,175,55,.4); cursor:pointer; transition:all .15s;}
   .modetoggle button.on{background:linear-gradient(180deg, rgba(212,175,55,.28), rgba(212,175,55,.07)); color:var(--gold-l); border-color:var(--gold);}
+  .distopt{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; font-family:'Fredoka','Nunito',sans-serif; font-size:13.5px; color:var(--ice); cursor:pointer; margin:-6px 0 18px;}
+  .distopt input{width:16px; height:16px; accent-color:var(--gold); cursor:pointer;}
+  .distopt .hint{color:var(--steel); font-size:12.5px;}
   .draftrow.active{background:rgba(212,175,55,.10); border-radius:8px; margin:0 -8px; padding-left:8px; padding-right:8px;}
   .aitem,.aitem-s{display:inline-flex; align-items:center; gap:2px; background:rgba(143,208,238,.08);
     border:1px solid rgba(143,208,238,.3); border-radius:6px; padding:2px 7px; font-size:14px; color:var(--ice-l);}
@@ -365,6 +368,7 @@ function calc(){
 let DRAFT_MODE = false;
 let DRAFT = null;
 let CTX = null;
+let DISTRIBUTE_REMAINDER = false;
 const VAL = {}; ITEMS.forEach(it => VAL[it.id] = it.val);
 const chipImg = id => ICON[id] ? `<img class="iico" src="${ICON[id]}" alt="" title="${NAME[id]}">` : '';
 
@@ -383,6 +387,10 @@ function renderDistro(members, winnerItems, restUnits, restValue){
     <button class="${DRAFT_MODE?'':'on'}" onclick="setDraftMode(false)">Auto</button>
     <button class="${DRAFT_MODE?'on':''}" onclick="setDraftMode(true)">Draft it yourself</button>
   </div>`;
+
+  if(!DRAFT_MODE){
+    html += `<label class="distopt"><input type="checkbox" ${DISTRIBUTE_REMAINDER?'checked':''} onchange="setDistRemainder(this.checked)"> Distribute remainder <span class="hint">(push leftovers down the roll order instead of a host pool)</span></label>`;
+  }
 
   if(numWinners > 0){
     html += '<div class="distro-block"><div class="distro-h">High-value winners (sit out the rest)</div>';
@@ -428,7 +436,7 @@ function renderDistro(members, winnerItems, restUnits, restValue){
 function renderAuto(share, restUnits, remaining, restValue){
   const zone = document.getElementById('splitzone');
   const listStr = obj => Object.entries(obj).map(([id,c])=>`${chipImg(id)}${c}\u00D7 ${NAME[id]}`).join(', ');
-  const units = restUnits.slice().sort((a,b)=> b.value - a.value || b.prio - a.prio);
+  const units = restUnits.map(u=>({id:u.id, value:u.value, prio:u.prio})).sort((a,b)=> b.value - a.value || b.prio - a.prio);
   const players = Array.from({length:remaining}, ()=>({total:0, items:{}}));
   const leftover = {};
   // Round-robin draft: each player takes one item per pass, in roll order (top roller first),
@@ -451,7 +459,28 @@ function renderAuto(share, restUnits, remaining, restValue){
   }
   units.forEach(u=>{ if(!u.taken) leftover[u.id] = (leftover[u.id]||0)+1; });
 
-  let html = `<div class="distro-block"><div class="distro-h">The split: ${fmtVal(share)} value each across ${remaining} players</div>`;
+  // "Distribute remainder" ON: after the equal share, leftover items keep flowing down the
+  // roll order (Player 1, 2, 3...) one item at a time until the pool is empty. Shares go uneven.
+  let distributed = false;
+  if(DISTRIBUTE_REMAINDER){
+    const extra = units.filter(u=>!u.taken);   // still sorted best-first
+    if(extra.length){
+      distributed = true;
+      let p = 0;
+      extra.forEach(u=>{
+        u.taken = true;
+        players[p].total = +(players[p].total + u.value).toFixed(2);
+        players[p].items[u.id] = (players[p].items[u.id]||0)+1;
+        p = (p+1) % players.length;
+      });
+      for(const k in leftover) delete leftover[k];
+    }
+  }
+
+  const headTxt = distributed
+    ? `The split: ${fmtVal(share)} base each, then remainder down the roll order`
+    : `The split: ${fmtVal(share)} value each across ${remaining} players`;
+  let html = `<div class="distro-block"><div class="distro-h">${headTxt}</div>`;
   players.forEach((p,i)=>{
     const picks = Object.keys(p.items).length ? listStr(p.items) : '<span class="muted">nothing this pass</span>';
     const label = i===0 ? 'Player 1 <span class="muted">(top roller)</span>' : 'Player '+(i+1);
@@ -460,7 +489,9 @@ function renderAuto(share, restUnits, remaining, restValue){
   html += '</div>';
 
   const leftEntries = Object.entries(leftover);
-  if(leftEntries.length){
+  if(distributed){
+    html += `<p class="distro-note">Remainder pushed down the roll order (Player 1, 2, 3...), so the shares above come out uneven.</p>`;
+  } else if(leftEntries.length){
     const allocated = players.reduce((s,p)=>s+p.total,0);
     const leftVal = +(restValue - allocated).toFixed(2);
     html += `<div class="distro-leftover"><b>Host pool / leftover (${fmtVal(leftVal)} value):</b> ${listStr(leftover)}. The remainder that doesn't divide evenly, host's call.</div>`;
@@ -513,6 +544,7 @@ function renderDraft(){
 }
 
 function setDraftMode(on){ DRAFT_MODE = on; if(!on) DRAFT = null; refreshDistro(); }
+function setDistRemainder(on){ DISTRIBUTE_REMAINDER = on; refreshDistro(); }
 function refreshDistro(){ if(CTX) renderDistro(CTX.members, CTX.winnerItems, CTX.restUnits, CTX.restValue); }
 function draftAssign(id){
   const D = DRAFT; if(!D) return;
