@@ -58,6 +58,10 @@
     border:1.5px solid var(--gold-d); display:flex; align-items:center; justify-content:center;}
   .badge span{transform:rotate(-45deg); font-family:'Fredoka','Nunito',sans-serif; font-weight:900; font-size:15px; color:#10202f;}
   .badge.sss span{font-size:10px; letter-spacing:0;}
+  .badge.sss{cursor:help;}
+  .sitefoot{max-width:760px; margin:20px auto 4px; text-align:center; color:var(--steel); font-size:13px; line-height:1.7;}
+  .sitefoot b{color:var(--gold-l);}
+  .sitefoot .spk{color:var(--gold);}
   .b3{background:linear-gradient(180deg,#fff0c0,var(--gold));}
   .b2{background:linear-gradient(180deg,var(--gold-l),var(--gold-d));}
   .b1{background:linear-gradient(180deg,#d4a463,#8a5a28);}
@@ -196,6 +200,11 @@
 
     <div class="distro" id="distro"></div>
   </div>
+
+  <footer class="sitefoot">
+    Loot-split idea inspired by <b>Tzei</b>'s tool for alliance in-house runs, thank you! <span class="spk">&#10022;</span><br>
+    I'm planning more calculators and beginner-friendly written guides like this. Pink Bean and future bosses next, made to help newer players find their footing.
+  </footer>
 </div>
 
 <script>
@@ -249,9 +258,10 @@ GROUPS.forEach(g=>{
     const t=tierOf(it.val);
     const badgeClass = t===3?'b3 sss':t===2?'b2':t===1?'b1':'bh';
     const badgeTxt = t===3 ? 'SSS' : fmtVal(it.val);
+    const badgeTitle = t===3 ? ' title="Won in a separate roll, so SSS items are not part of the point split."' : '';
     const tierClass  = 'tier'+(t==='h'?'h':t);
     html += `<div class="item ${tierClass}${it.cap1?' cap1':''}">
-      <div class="badge ${badgeClass}"><span>${badgeTxt}</span></div>
+      <div class="badge ${badgeClass}"${badgeTitle}><span>${badgeTxt}</span></div>
       <div class="name">${it.name}<span class="mkt" id="mkt_${it.id}"></span></div>
       ${it.cap1?'<span class="maxtag">max 1</span>':''}
       <input type="number" id="cnt_${it.id}" min="0" max="${it.max}" value="${it.def}" oninput="onInput('${it.id}')"></div>`;
@@ -441,7 +451,7 @@ function renderAuto(share, restUnits, remaining, restValue){
   }
   units.forEach(u=>{ if(!u.taken) leftover[u.id] = (leftover[u.id]||0)+1; });
 
-  let html = `<div class="distro-block"><div class="distro-h">The split &mdash; ${fmtVal(share)} value each across ${remaining} players</div>`;
+  let html = `<div class="distro-block"><div class="distro-h">The split: ${fmtVal(share)} value each across ${remaining} players</div>`;
   players.forEach((p,i)=>{
     const picks = Object.keys(p.items).length ? listStr(p.items) : '<span class="muted">nothing this pass</span>';
     const label = i===0 ? 'Player 1 <span class="muted">(top roller)</span>' : 'Player '+(i+1);
@@ -461,7 +471,7 @@ function renderAuto(share, restUnits, remaining, restValue){
 function renderDraft(){
   const zone = document.getElementById('splitzone');
   const D = DRAFT;
-  let h = `<div class="distro-block"><div class="distro-h">Draft &mdash; ${fmtVal(D.share)} value each across ${D.players.length} players</div>`;
+  let h = `<div class="distro-block"><div class="distro-h">Draft: ${fmtVal(D.share)} value each across ${D.players.length} players</div>`;
   h += `<div class="distro-sub">Click an item in the pool to give it to whoever's picking. Click one of their items to put it back. Use prev / next to change whose turn it is.</div>`;
 
   D.players.forEach((p,i)=>{
@@ -472,7 +482,7 @@ function renderDraft(){
         const inner = `${chipImg(id)}${c}\u00D7`;
         return cur ? `<button class="aitem" title="remove" onclick="draftUnassign('${id}')">${inner}</button>` : `<span class="aitem-s">${inner}</span>`;
       }).join(' ');
-    } else { picks = '<span class="muted">&mdash;</span>'; }
+    } else { picks = '<span class="muted">&middot;</span>'; }
     const label = i===0 ? 'Player 1 (top roller)' : 'Player '+(i+1);
     h += `<div class="drow draftrow${cur?' active':''}"><span class="pl">${cur?'\u25B6 ':''}${label}</span><span class="picks">${picks} <span class="ptval">${fmtVal(p.total)}/${fmtVal(D.share)}</span></span></div>`;
   });
