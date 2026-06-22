@@ -86,6 +86,9 @@
   .disclaimer{margin-top:18px; padding:14px 16px; border-radius:12px; font-size:14.5px; line-height:1.55;
     background:rgba(143,208,238,.07); border:1px solid rgba(143,208,238,.35); color:var(--ice-l);}
   .disclaimer b{color:var(--gold-l);}
+  .pricenote{margin-top:10px; font-size:13.5px; font-style:italic; color:var(--ice); text-align:center; line-height:1.5;}
+  .pricenote a{color:var(--gold-l); text-decoration:none; border-bottom:1px dotted var(--gold-d);}
+  .pricenote a:hover{color:#fff;}
   .reset{display:block; margin:18px auto 0; font-family:'Cinzel',serif; letter-spacing:2px;
     background:transparent; color:var(--gold-l); border:1px solid var(--gold-d); border-radius:8px;
     padding:9px 22px; cursor:pointer; font-size:14px;}
@@ -104,7 +107,7 @@
         <h2>The Drop</h2>
         <div class="members">
           <label for="members">Players in the run</label>
-          <input type="number" id="members" min="1" max="30" value="8" oninput="calc()">
+          <input type="number" id="members" min="1" max="30" value="8" oninput="onMembers()">
         </div>
         <div id="items"></div>
       </div>
@@ -113,8 +116,9 @@
         <h2>The Split</h2>
         <div class="out" id="out"></div>
         <div class="disclaimer">
-          <b>Note on methods.</b> This uses the separate-roll method: EB / CB / Perfect Pendant are rolled on their own, and those winners sit out the rest. Some hosts instead do one roll for everything, where the top rollers take the big items and the loot continues down the order from the 3rd person on. Either way, loot distribution is ultimately the <b>host's preferred method</b>, so check how yours runs it.
+          <b>Note on methods.</b> EB / CB / Perfect Pendant are rolled on their own first, and those winners sit out the rest. The share above is each player's <b>point target</b>: going by roll order (highest first), the top roller picks items up to their share, then the next player, and so on. Some hosts instead do one roll for everything, where the top rollers take the big items and the loot continues down the order. Either way, loot distribution is ultimately the <b>host's preferred method</b>, so check how yours runs it.
         </div>
+        <div class="pricenote">Tier values reflect an item's lasting worth, not just current spot price: scrolls hold value as a stable currency, while Diamond prices may drift down over time. For live prices, check <a href="https://yuna.ms/market" target="_blank" rel="noopener">yuna.ms/market</a>.</div>
         <button class="reset" onclick="resetAll()">Reset to defaults</button>
       </div>
     </div>
@@ -127,6 +131,7 @@ const ITEMS = [
   {id:'eb',  name:"Explorer's Blessing", val:3, sep:true,  group:'opt',  def:0, max:1,  cap1:true},
   {id:'cb',  name:"Cygnus' Blessing",    val:3, sep:true,  group:'opt',  def:0, max:1,  cap1:true},
   {id:'pp',  name:"Perfect Pendant",     val:3, sep:true,  group:'opt',  def:0, max:1,  cap1:true},
+  {id:'tp',  name:"Low-roll Pendant",    val:1, sep:false, group:'opt',  def:0, max:1,  cap1:true},
   {id:'ws',  name:"White Scroll (WS)",   val:2, sep:false, group:'guar', def:1, max:1,  cap1:true},
   {id:'cs',  name:"Chaos Scroll (CS)",   val:2, sep:false, group:'guar', def:1, max:1,  cap1:true},
   {id:'adc', name:"Advanced Dark Crystal", val:2, sep:false, group:'guar', def:1, max:1, cap1:true},
@@ -153,19 +158,50 @@ GROUPS.forEach(g=>{
       <div class="badge ${badgeClass}"><span>${fmtVal(it.val)}</span></div>
       <div class="name">${it.name}</div>
       ${it.cap1?'<span class="maxtag">max 1</span>':''}
-      <input type="number" id="cnt_${it.id}" min="0" max="${it.max}" value="${it.def}" oninput="calc()"></div>`;
+      <input type="number" id="cnt_${it.id}" min="0" max="${it.max}" value="${it.def}" oninput="onInput('${it.id}')"></div>`;
   });
 });
 document.getElementById('items').innerHTML = html;
+
+function onMembers(){
+  const el = document.getElementById('members');
+  if(el.value !== ''){
+    let v = parseInt(el.value);
+    if(isNaN(v) || v < 0) v = 0;
+    if(v > 30) v = 30;
+    el.value = v;
+  }
+  calc();
+}
+
+function onInput(id){
+  const el = document.getElementById('cnt_'+id);
+  const it = ITEMS.find(x => x.id === id);
+  if(el.value !== ''){
+    let v = parseInt(el.value);
+    if(isNaN(v) || v < 0) v = 0;
+    if(v > it.max) v = it.max;          // never let the field show more than the cap
+    el.value = v;
+    // only one pendant per run: Perfect and Low-roll are mutually exclusive
+    if(v >= 1 && id === 'pp') document.getElementById('cnt_tp').value = 0;
+    if(v >= 1 && id === 'tp') document.getElementById('cnt_pp').value = 0;
+  }
+  calc();
+}
 
 function calc(){
   const members = Math.max(0, parseInt(document.getElementById('members').value)||0);
   let sepWinners=0; const sepList=[];
   let restValue=0; const restBreak=[];
+  let pendantSeen=false;
 
   ITEMS.forEach(it=>{
     let c = parseInt(document.getElementById('cnt_'+it.id).value)||0;
     c = Math.min(it.max, Math.max(0, c));
+    if(it.id==='pp' || it.id==='tp'){           // only one pendant per run
+      if(pendantSeen) c = 0;
+      else if(c > 0){ pendantSeen = true; c = 1; }
+    }
     if(c===0) return;
     if(it.sep){
       sepWinners += c;
