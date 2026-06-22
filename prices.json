@@ -1,11 +1,11 @@
 {
-  "updated": "2026-06-22T08:20:26Z",
-  "source": "https://yuna.ms/market?period=7",
+  "updated": "2026-06-22T08:55:55Z",
+  "source": "https://yuna.ms/market",
   "prices": {
-    "ws": 41200000,
-    "cs": 38800000,
-    "adc": 70000000,
-    "ed": 44800000,
+    "ws": 38400000,
+    "cs": 37500000,
+    "adc": 60900000,
+    "ed": 46300000,
     "cry": 16800000
   }
 }
