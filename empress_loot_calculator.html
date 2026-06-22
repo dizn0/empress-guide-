@@ -17,7 +17,7 @@
     font-family:'EB Garamond',Georgia,serif; color:var(--ice-l);
     background:radial-gradient(120% 90% at 50% 8%, var(--bg0) 0%, var(--bg1) 55%, var(--bg2) 100%) fixed;
   }
-  .wrap{max-width:980px; margin:0 auto;}
+  .wrap{max-width:1000px; margin:0 auto;}
   .card{
     background:linear-gradient(180deg, rgba(19,36,63,.55), rgba(10,21,38,.55));
     border:2px solid var(--gold); border-radius:16px; padding:28px 28px 34px;
@@ -34,19 +34,26 @@
   .rule .crim{height:2px; width:24px; background:var(--crim);}
   .rule .dia{width:14px; height:14px; background:var(--gold); transform:rotate(45deg);}
   .grid{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
-  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+  @media(max-width:780px){.grid{grid-template-columns:1fr;}}
   h2{font-family:'Cinzel',serif; font-weight:700; font-size:18px; letter-spacing:2px;
     color:var(--gold-l); margin:0 0 14px; border-bottom:1px solid rgba(212,175,55,.35); padding-bottom:8px;}
-  .members{display:flex; align-items:center; gap:12px; margin-bottom:22px;
+  .members{display:flex; align-items:center; gap:12px; margin-bottom:18px;
     background:var(--panel); border:1px solid rgba(212,175,55,.4); border-radius:12px; padding:14px 16px;}
   .members label{font-size:20px; flex:1;}
-  .item{display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:10px;
+  .section-title{font-family:'Cinzel',serif; font-size:14px; letter-spacing:2px; color:var(--ice);
+    text-transform:uppercase; margin:18px 0 9px;}
+  .section-title span{font-family:'EB Garamond',serif; text-transform:none; letter-spacing:0;
+    font-style:italic; color:var(--steel); font-size:14px;}
+  .item{display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px;
     background:var(--panel); border:1px solid rgba(212,175,55,.22); margin-bottom:9px;}
   .item.tier3{border-left:4px solid var(--gold-l);}
   .item.tier2{border-left:4px solid var(--gold);}
   .item.tier1{border-left:4px solid #b07a3a;}
   .item.tierh{border-left:4px solid var(--ice);}
+  .item.cap1{background:rgba(244,226,160,.09); border-color:rgba(244,226,160,.4);}
   .item .name{flex:1; font-size:18px;}
+  .maxtag{font-size:10px; letter-spacing:1.5px; color:#e7d79a; background:rgba(244,226,160,.16);
+    border:1px solid rgba(244,226,160,.5); border-radius:6px; padding:2px 7px; text-transform:uppercase;}
   .badge{width:30px; height:30px; flex:none; transform:rotate(45deg); border-radius:6px;
     border:1.5px solid var(--gold-d); display:flex; align-items:center; justify-content:center;}
   .badge span{transform:rotate(-45deg); font-family:'Cinzel',serif; font-weight:900; font-size:15px; color:#10202f;}
@@ -54,14 +61,15 @@
   .b2{background:linear-gradient(180deg,var(--gold-l),var(--gold-d));}
   .b1{background:linear-gradient(180deg,#d4a463,#8a5a28);}
   .bh{background:linear-gradient(180deg,var(--ice-l),var(--steel));}
-  input[type=number]{width:74px; font-family:'Cinzel',serif; font-size:18px; text-align:center;
+  input[type=number]{width:70px; font-family:'Cinzel',serif; font-size:18px; text-align:center;
     background:#091627; color:var(--gold-l); border:1px solid var(--gold-d); border-radius:8px; padding:7px 4px;}
+  .item.cap1 input[type=number]{background:#1a1d14; color:#f4e2a0; border-color:rgba(244,226,160,.5);}
   input[type=number]:focus{outline:none; border-color:var(--ice); box-shadow:0 0 8px rgba(143,208,238,.4);}
   .out{background:var(--panel2); border:1px solid rgba(212,175,55,.4); border-radius:12px; padding:18px 18px;}
-  .out .line2{display:flex; justify-content:space-between; padding:7px 0; font-size:18px;
+  .out .line2{display:flex; justify-content:space-between; gap:10px; padding:7px 0; font-size:18px;
     border-bottom:1px dashed rgba(143,208,238,.2);}
   .out .line2:last-of-type{border-bottom:none;}
-  .out .line2 .v{font-family:'Cinzel',serif; color:var(--gold-l);}
+  .out .line2 .v{font-family:'Cinzel',serif; color:var(--gold-l); text-align:right;}
   .share{margin-top:16px; text-align:center; padding:16px; border-radius:12px;
     background:linear-gradient(180deg, rgba(212,175,55,.12), rgba(212,175,55,.02));
     border:1px solid var(--gold);}
@@ -75,7 +83,10 @@
   .leftover b{color:var(--gold-l);}
   .warn{color:#f3c0c0;}
   .sep-list{font-size:16px; color:var(--ice-l); margin:4px 0 0; padding-left:18px;}
-  .reset{display:block; margin:22px auto 0; font-family:'Cinzel',serif; letter-spacing:2px;
+  .disclaimer{margin-top:18px; padding:14px 16px; border-radius:12px; font-size:14.5px; line-height:1.55;
+    background:rgba(143,208,238,.07); border:1px solid rgba(143,208,238,.35); color:var(--ice-l);}
+  .disclaimer b{color:var(--gold-l);}
+  .reset{display:block; margin:18px auto 0; font-family:'Cinzel',serif; letter-spacing:2px;
     background:transparent; color:var(--gold-l); border:1px solid var(--gold-d); border-radius:8px;
     padding:9px 22px; cursor:pointer; font-size:14px;}
   .reset:hover{background:rgba(212,175,55,.12);}
@@ -92,8 +103,8 @@
       <div>
         <h2>The Drop</h2>
         <div class="members">
-          <label for="members">Members in the run</label>
-          <input type="number" id="members" min="1" max="30" value="6" oninput="calc()">
+          <label for="members">Players in the run</label>
+          <input type="number" id="members" min="1" max="30" value="8" oninput="calc()">
         </div>
         <div id="items"></div>
       </div>
@@ -101,50 +112,60 @@
       <div>
         <h2>The Split</h2>
         <div class="out" id="out"></div>
-        <button class="reset" onclick="resetAll()">Clear all</button>
+        <div class="disclaimer">
+          <b>Note on methods.</b> This uses the separate-roll method: EB / CB / Perfect Pendant are rolled on their own, and those winners sit out the rest. Some hosts instead do one roll for everything, where the top rollers take the big items and the loot continues down the order from the 3rd person on. Either way, loot distribution is ultimately the <b>host's preferred method</b>, so check how yours runs it.
+        </div>
+        <button class="reset" onclick="resetAll()">Reset to defaults</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// item: name, value, tier(3/2/1/h), separate(rolled separately & winner excluded)
+// val, sep (rolled separately & winner excluded), group, def (default qty), max, cap1 (max-1 shaded)
 const ITEMS = [
-  {id:'eb',  name:"Explorer's Blessing", val:3, tier:3, sep:true},
-  {id:'cb',  name:"Cygnus' Blessing",    val:3, tier:3, sep:true},
-  {id:'pp',  name:"Perfect Pendant",     val:3, tier:3, sep:true},
-  {id:'ws',  name:"White Scroll (WS)",   val:2, tier:2, sep:false},
-  {id:'cs',  name:"Chaos Scroll (CS)",   val:2, tier:2, sep:false},
-  {id:'adc', name:"Advanced Dark Crystal", val:2, tier:2, sep:false},
-  {id:'sw',  name:"Sweetwater Weapon",   val:1, tier:1, sep:false},
-  {id:'lp',  name:"Low-roll Pendant",    val:1, tier:1, sep:false},
-  {id:'ed',  name:"Empress' Diamond",    val:1, tier:1, sep:false},
-  {id:'cry', name:"Stat Advanced Crystals", val:0.5, tier:'h', sep:false},
+  {id:'eb',  name:"Explorer's Blessing", val:3, sep:true,  group:'opt',  def:0, max:1,  cap1:true},
+  {id:'cb',  name:"Cygnus' Blessing",    val:3, sep:true,  group:'opt',  def:0, max:1,  cap1:true},
+  {id:'pp',  name:"Perfect Pendant",     val:3, sep:true,  group:'opt',  def:0, max:1,  cap1:true},
+  {id:'ws',  name:"White Scroll (WS)",   val:2, sep:false, group:'guar', def:1, max:1,  cap1:true},
+  {id:'cs',  name:"Chaos Scroll (CS)",   val:2, sep:false, group:'guar', def:1, max:1,  cap1:true},
+  {id:'adc', name:"Advanced Dark Crystal", val:2, sep:false, group:'guar', def:1, max:1, cap1:true},
+  {id:'cry', name:"Stat Advanced Crystals", val:0.5, sep:false, group:'guar', def:4, max:20, cap1:false},
+  {id:'ed',  name:"Empress' Diamond",    val:1, sep:false, group:'guar', def:5, max:20, cap1:false},
+  {id:'sw',  name:"Sweetwater Weapon",   val:1, sep:false, group:'wpn',  def:0, max:30, cap1:false},
 ];
-const fmtVal = v => Number.isInteger(v) ? v : v.toFixed(1);
+const GROUPS = [
+  {key:'opt',  title:'Optional Drops', sub:'max 1 each'},
+  {key:'guar', title:'Guaranteed Drops', sub:'drop every run'},
+  {key:'wpn',  title:'Sweetwater Weapons', sub:'however many dropped'},
+];
+const fmtVal = v => Number.isInteger(v) ? v : (+v).toFixed(1);
+const tierOf = v => v===3?3:v===2?2:v===1?1:'h';
 
-const itemsDiv = document.getElementById('items');
-ITEMS.forEach(it=>{
-  const badgeClass = it.tier===3?'b3':it.tier===2?'b2':it.tier===1?'b1':'bh';
-  const tierClass  = it.tier==='h'?'tierh':'tier'+it.tier;
-  const row = document.createElement('div');
-  row.className = 'item '+tierClass;
-  row.innerHTML = `
-    <div class="badge ${badgeClass}"><span>${fmtVal(it.val)}</span></div>
-    <div class="name">${it.name}</div>
-    <input type="number" id="cnt_${it.id}" min="0" max="99" value="0" oninput="calc()">`;
-  itemsDiv.appendChild(row);
+let html='';
+GROUPS.forEach(g=>{
+  html += `<div class="section-title">${g.title} <span>${g.sub}</span></div>`;
+  ITEMS.filter(it=>it.group===g.key).forEach(it=>{
+    const t=tierOf(it.val);
+    const badgeClass = t===3?'b3':t===2?'b2':t===1?'b1':'bh';
+    const tierClass  = 'tier'+(t==='h'?'h':t);
+    html += `<div class="item ${tierClass}${it.cap1?' cap1':''}">
+      <div class="badge ${badgeClass}"><span>${fmtVal(it.val)}</span></div>
+      <div class="name">${it.name}</div>
+      ${it.cap1?'<span class="maxtag">max 1</span>':''}
+      <input type="number" id="cnt_${it.id}" min="0" max="${it.max}" value="${it.def}" oninput="calc()"></div>`;
+  });
 });
+document.getElementById('items').innerHTML = html;
 
 function calc(){
   const members = Math.max(0, parseInt(document.getElementById('members').value)||0);
-  let sepWinners = 0;
-  const sepList = [];
-  let restValue = 0;
-  const restBreak = [];
+  let sepWinners=0; const sepList=[];
+  let restValue=0; const restBreak=[];
 
   ITEMS.forEach(it=>{
-    const c = Math.max(0, parseInt(document.getElementById('cnt_'+it.id).value)||0);
+    let c = parseInt(document.getElementById('cnt_'+it.id).value)||0;
+    c = Math.min(it.max, Math.max(0, c));
     if(c===0) return;
     if(it.sep){
       sepWinners += c;
@@ -161,45 +182,40 @@ function calc(){
   const out = document.getElementById('out');
 
   if(members < 1){
-    out.innerHTML = `<p class="note warn">Enter how many members are in the run.</p>`;
+    out.innerHTML = `<p class="note warn">Enter how many players are in the run.</p>`;
     return;
   }
 
-  let html = '';
-  html += `<div class="line2"><span>High-value items (rolled separately)</span><span class="v">${sepWinners}</span></div>`;
-  if(sepList.length){
-    html += `<ul class="sep-list">${sepList.map(s=>'<li>'+s+'</li>').join('')}</ul>`;
-  }
-  html += `<div class="line2"><span>Winners excluded from the rest</span><span class="v">${cappedSep}</span></div>`;
-  html += `<div class="line2"><span>Members still in the split</span><span class="v">${members} \u2212 ${cappedSep} = ${remaining}</span></div>`;
-  html += `<div class="line2"><span>Total value of remaining loot</span><span class="v">${fmtVal(restValue)}</span></div>`;
-  if(restBreak.length){
-    html += `<ul class="sep-list">${restBreak.map(s=>'<li>'+s+'</li>').join('')}</ul>`;
-  }
-
-  out.innerHTML = html;
+  let h='';
+  h += `<div class="line2"><span>High-value items (rolled separately)</span><span class="v">${sepWinners}</span></div>`;
+  if(sepList.length) h += `<ul class="sep-list">${sepList.map(s=>'<li>'+s+'</li>').join('')}</ul>`;
+  h += `<div class="line2"><span>Winners excluded from the rest</span><span class="v">${cappedSep}</span></div>`;
+  h += `<div class="line2"><span>Players still in the split</span><span class="v">${members} \u2212 ${cappedSep} = ${remaining}</span></div>`;
+  h += `<div class="line2"><span>Total value of remaining loot</span><span class="v">${fmtVal(restValue)}</span></div>`;
+  if(restBreak.length) h += `<ul class="sep-list">${restBreak.map(s=>'<li>'+s+'</li>').join('')}</ul>`;
+  out.innerHTML = h;
 
   const share = document.createElement('div');
   share.className = 'share';
   if(remaining > 0){
     const per = restValue / remaining;
-    const floored = Math.floor(per * 2) / 2;            // round DOWN to nearest 0.5
-    const leftover = +(restValue - floored * remaining).toFixed(2);
-    share.innerHTML = `<div class="lbl">Each member's share (rounded down)</div>
+    const floored = Math.floor(per*2)/2;                 // round DOWN to nearest 0.5
+    const leftover = +(restValue - floored*remaining).toFixed(2);
+    share.innerHTML = `<div class="lbl">Each player's share (rounded down)</div>
       <div class="num">${fmtVal(floored)}</div>
-      <div class="note">${fmtVal(restValue)} total \u00F7 ${remaining} members = ${per.toFixed(2)}, rounded down to ${fmtVal(floored)}</div>`;
+      <div class="note">${fmtVal(restValue)} total \u00F7 ${remaining} players = ${per.toFixed(2)}, rounded down to ${fmtVal(floored)}</div>`;
     if(leftover > 0){
       share.innerHTML += `<div class="leftover"><b>Leftover: ${fmtVal(leftover)} value.</b> The loot doesn't divide evenly, so there's a fractional remainder that can't be spread cleanly. This one's the host's call: they can keep it, or forgo their own fraction so everyone else's share comes out whole.</div>`;
     }
   } else {
-    share.innerHTML = `<div class="note warn">Every member already won a high-value roll. Split the rest by group call.</div>`;
+    share.innerHTML = `<div class="note warn">Every player already won a high-value roll. Split the rest by group call.</div>`;
   }
   out.appendChild(share);
 }
 
 function resetAll(){
-  document.getElementById('members').value = 6;
-  ITEMS.forEach(it=>document.getElementById('cnt_'+it.id).value = 0);
+  document.getElementById('members').value = 8;
+  ITEMS.forEach(it=>document.getElementById('cnt_'+it.id).value = it.def);
   calc();
 }
 
