@@ -1,0 +1,37 @@
+name: Update market prices
+
+on:
+  schedule:
+    - cron: '17 * * * *'      # hourly, at :17 past (GitHub delays short crons, so hourly is realistic)
+  workflow_dispatch:           # lets you run it on demand from the Actions tab
+
+permissions:
+  contents: write              # needed so the job can commit prices.json back
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install requests beautifulsoup4
+
+      - name: Fetch prices
+        run: python scripts/fetch_prices.py
+
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain prices.json)" ]; then
+            git config user.name  "prices-bot"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add prices.json
+            git commit -m "chore: update market prices"
+            git push
+          else
+            echo "No price changes."
+          fi
