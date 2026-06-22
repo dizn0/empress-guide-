@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Fetch YunaMS market 7-day average prices for the key Empress loot items
-and write prices.json at the repo root.
+"""Fetch each item's YunaMS market detail page and grab its headline
+"Avg Price" (the 90-day average), then write prices.json at the repo root.
 
 Run automatically by .github/workflows/update-prices.yml, or by hand:
     pip install requests beautifulsoup4
@@ -10,26 +10,24 @@ import json, re, sys, time, datetime, pathlib
 import requests
 from bs4 import BeautifulSoup
 
-BASE = "https://yuna.ms/market"
-PERIOD = 7            # average over the last 7 days (stable-ish)
-MAX_PAGES = 30
+BASE = "https://yuna.ms/market"          # detail page = BASE/<itemId>
 TIMEOUT = 25
 UA = "Mozilla/5.0 (compatible; empress-guide-pricebot/1.0)"
 
-# YunaMS item ID  ->  internal id used by the calculator
+# internal calculator id -> YunaMS item ID
 TARGETS = {
-    "2340000": "ws",    # White Scroll
-    "2049100": "cs",    # Chaos Scroll 60%
-    "4251402": "adc",   # Advanced Dark Crystal
-    "4032133": "ed",    # Empress' Diamond
-    "4251002": "cry",   # Advanced LUK Crystal (stat crystal)
+    "ws":  "2340000",   # White Scroll
+    "cs":  "2049100",   # Chaos Scroll 60%
+    "adc": "4251402",   # Advanced Dark Crystal
+    "ed":  "4032133",   # Empress' Diamond
+    "cry": "4251002",   # Advanced LUK Crystal (stat crystal)
 }
 
 MONEY = re.compile(r"([\d,]+(?:\.\d+)?)\s*([MK])?", re.I)
 
 
 def to_meso(text):
-    """'40.4M' -> 40400000, '250.0K' -> 250000, '777' -> 777."""
+    """'60.9M' -> 60900000, '250.0K' -> 250000, '777' -> 777."""
     if not text:
         return 0
     m = MONEY.search(text.replace(",", ""))
@@ -44,61 +42,32 @@ def to_meso(text):
     return int(round(num))
 
 
-def avg_col_index(table):
-    """Column index whose header mentions 'Avg'. Falls back to 2
-    (Item | Latest | Avg | Sales)."""
-    head = table.find("tr")
-    if not head:
-        return 2
-    cells = head.find_all(["th", "td"])
-    for i, c in enumerate(cells):
-        if "avg" in c.get_text(" ", strip=True).lower():
-            return i
-    return 2
-
-
-def id_in_row(row):
-    """Item ID from the maplestory.io icon URL, or the 'ID: nnn' text."""
-    m = re.search(r"/item/(\d+)/", str(row))
-    if m:
-        return m.group(1)
-    m = re.search(r"ID:\s*(\d+)", row.get_text(" ", strip=True))
-    return m.group(1) if m else None
-
-
-def parse_page(html, found):
-    soup = BeautifulSoup(html, "html.parser")
-    for table in soup.find_all("table"):
-        ci = avg_col_index(table)
-        for row in table.find_all("tr"):
-            iid = id_in_row(row)
-            if not iid or iid not in TARGETS or TARGETS[iid] in found:
-                continue
-            cells = row.find_all(["td", "th"])
-            if len(cells) <= ci:
-                continue
-            meso = to_meso(cells[ci].get_text(" ", strip=True))
-            if meso > 0:
-                found[TARGETS[iid]] = meso
+def fetch_avg(sess, item_id):
+    """Read the item's detail page and return its 'Avg Price' in mesos."""
+    url = f"{BASE}/{item_id}"
+    r = sess.get(url, timeout=TIMEOUT)
+    r.raise_for_status()
+    text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+    idx = text.find("Avg Price")
+    if idx == -1:
+        return 0
+    # the average value is the first money token right after the label
+    return to_meso(text[idx + len("Avg Price"): idx + len("Avg Price") + 40])
 
 
 def main():
-    found = {}
     sess = requests.Session()
     sess.headers["User-Agent"] = UA
-    want = set(TARGETS.values())
-    for page in range(1, MAX_PAGES + 1):
-        url = f"{BASE}?period={PERIOD}&page={page}"
+
+    found = {}
+    for key, iid in TARGETS.items():
         try:
-            r = sess.get(url, timeout=TIMEOUT)
-            r.raise_for_status()
+            meso = fetch_avg(sess, iid)
+            print(f"{key} ({iid}): {meso}")
+            if meso > 0:
+                found[key] = meso
         except Exception as e:
-            print(f"warn: page {page} failed: {e}", file=sys.stderr)
-            continue
-        parse_page(r.text, found)
-        print(f"page {page}: have {sorted(found)}")
-        if want.issubset(found):
-            break
+            print(f"warn: {key} ({iid}) failed: {e}", file=sys.stderr)
         time.sleep(0.5)
 
     out = pathlib.Path("prices.json")
@@ -116,7 +85,7 @@ def main():
 
     payload = {
         "updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source": f"{BASE}?period={PERIOD}",
+        "source": BASE,
         "prices": prices,
     }
     out.write_text(json.dumps(payload, indent=2) + "\n")
