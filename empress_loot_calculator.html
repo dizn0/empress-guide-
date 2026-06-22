@@ -57,6 +57,7 @@
   .badge{width:30px; height:30px; flex:none; transform:rotate(45deg); border-radius:6px;
     border:1.5px solid var(--gold-d); display:flex; align-items:center; justify-content:center;}
   .badge span{transform:rotate(-45deg); font-family:'Fredoka','Nunito',sans-serif; font-weight:900; font-size:15px; color:#10202f;}
+  .badge.sss span{font-size:10px; letter-spacing:0;}
   .b3{background:linear-gradient(180deg,#fff0c0,var(--gold));}
   .b2{background:linear-gradient(180deg,var(--gold-l),var(--gold-d));}
   .b1{background:linear-gradient(180deg,#d4a463,#8a5a28);}
@@ -246,10 +247,11 @@ GROUPS.forEach(g=>{
   html += `<div class="section-title">${g.title} <span>${g.sub}</span></div>`;
   ITEMS.filter(it=>it.group===g.key).forEach(it=>{
     const t=tierOf(it.val);
-    const badgeClass = t===3?'b3':t===2?'b2':t===1?'b1':'bh';
+    const badgeClass = t===3?'b3 sss':t===2?'b2':t===1?'b1':'bh';
+    const badgeTxt = t===3 ? 'SSS' : fmtVal(it.val);
     const tierClass  = 'tier'+(t==='h'?'h':t);
     html += `<div class="item ${tierClass}${it.cap1?' cap1':''}">
-      <div class="badge ${badgeClass}"><span>${fmtVal(it.val)}</span></div>
+      <div class="badge ${badgeClass}"><span>${badgeTxt}</span></div>
       <div class="name">${it.name}<span class="mkt" id="mkt_${it.id}"></span></div>
       ${it.cap1?'<span class="maxtag">max 1</span>':''}
       <input type="number" id="cnt_${it.id}" min="0" max="${it.max}" value="${it.def}" oninput="onInput('${it.id}')"></div>`;
