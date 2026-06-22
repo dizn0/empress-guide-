@@ -91,6 +91,14 @@
   .mkt{display:inline-block; margin-left:8px; font-size:12px; font-style:italic; color:var(--steel); font-family:'EB Garamond',Georgia,serif;}
   .pricestamp{margin-top:8px; font-size:12px; color:var(--steel); text-align:center; font-style:italic;}
   .pricestamp a{color:var(--gold-l); text-decoration:none; border-bottom:1px dotted var(--gold-d);}
+  .foldnote{margin-top:14px;}
+  .foldnote>summary{cursor:pointer; list-style:none; font-family:'Cinzel',serif; font-size:12.5px; letter-spacing:1px;
+    color:var(--gold-l); padding:9px 13px; border:1px solid var(--gold-d); border-radius:9px; background:rgba(212,175,55,.06);}
+  .foldnote>summary::-webkit-details-marker{display:none;}
+  .foldnote>summary::before{content:'\25B8'; color:var(--steel); margin-right:8px;}
+  .foldnote[open]>summary::before{content:'\25BE';}
+  .foldnote[open]>summary{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  .foldnote .disclaimer{margin-top:-1px; border-top-left-radius:0; border-top-right-radius:0;}
   .pricenote a:hover{color:#fff;}
   .reset{display:block; margin:18px auto 0; font-family:'Cinzel',serif; letter-spacing:2px;
     background:transparent; color:var(--gold-l); border:1px solid var(--gold-d); border-radius:8px;
@@ -159,9 +167,12 @@
       <div>
         <h2>The Split</h2>
         <div class="out" id="out"></div>
-        <div class="disclaimer">
-          <b>Note on methods.</b> EB / CB / Perfect Pendant are rolled on their own first, and those winners sit out the rest. The share above is each player's <b>point target</b>: going by roll order (highest first), the top roller picks items up to their share, then the next, and so on. Other hosts run it differently, some do a single roll for everything (top rollers take the big items, loot continues down the order), and some skip the tiers entirely and treat every item as equal value to keep distribution simple. Either way, loot distribution is ultimately the <b>host's preferred method</b>, so check how yours runs it.
-        </div>
+        <details class="foldnote">
+          <summary>How loot gets split (methods &amp; host's call)</summary>
+          <div class="disclaimer">
+            <b>Note on methods.</b> EB / CB / Perfect Pendant are rolled on their own first, and those winners sit out the rest. The share above is each player's <b>point target</b>: going by roll order (highest first), the top roller picks items up to their share, then the next, and so on. Other hosts run it differently, some do a single roll for everything (top rollers take the big items, loot continues down the order), and some skip the tiers entirely and treat every item as equal value to keep distribution simple. Either way, loot distribution is ultimately the <b>host's preferred method</b>, so check how yours runs it.
+          </div>
+        </details>
         <div class="pricenote">Tier values reflect an item's lasting worth, not just current spot price: scrolls hold value as a stable currency, while Diamond prices may drift down over time. For live prices, check <a href="https://yuna.ms/market" target="_blank" rel="noopener">yuna.ms/market</a>.</div>
         <div id="pricestamp" class="pricestamp"></div>
         <button class="reset" onclick="resetAll()">Reset to defaults</button>
@@ -340,7 +351,7 @@ function renderDistro(members, winnerItems, restUnits, restValue){
   const remaining = Math.max(members - numWinners, 0);
 
   let html = '<div class="distro-rule"></div><h2 class="distro-title">Sample Distribution</h2>';
-  html += `<p class="distro-note">One way a ${members}-player run could shake out. Players claim items in roll order up to their share, top roller first. Equal-value items are interchangeable, though: the top roller might take the ADC, or just as easily grab a Chaos Scroll instead (both are worth 2). This is one valid arrangement, not a fixed rule, people pick what they actually want up to their share.</p>`;
+  html += `<p class="distro-note">One fair way the ${members}-player split could land. Equal-value items are interchangeable, so the real picks are up to the players, this is just an example.</p>`;
 
   html += `<div class="modetoggle">
     <button class="${DRAFT_MODE?'':'on'}" onclick="setDraftMode(false)">Auto</button>
@@ -415,7 +426,6 @@ function renderAuto(share, restUnits, remaining, restValue){
   units.forEach(u=>{ if(!u.taken) leftover[u.id] = (leftover[u.id]||0)+1; });
 
   let html = `<div class="distro-block"><div class="distro-h">The split &mdash; ${fmtVal(share)} value each across ${remaining} players</div>`;
-  html += `<div class="distro-sub">Picks below are illustrative. Anyone may swap for a different equal-value item (take a CS instead of the ADC, etc.) &mdash; this just shows one fair arrangement.</div>`;
   players.forEach((p,i)=>{
     const picks = Object.keys(p.items).length ? listStr(p.items) : '<span class="muted">nothing this pass</span>';
     const label = i===0 ? 'Player 1 <span class="muted">(top roller)</span>' : 'Player '+(i+1);
