@@ -70,6 +70,9 @@
     background:linear-gradient(180deg,var(--gold-l),var(--gold-d)); -webkit-background-clip:text;
     background-clip:text; color:transparent;}
   .note{font-style:italic; color:var(--ice); font-size:15px; margin-top:14px; text-align:center;}
+  .leftover{margin-top:14px; padding:12px 14px; border-radius:10px; font-size:15px; line-height:1.5;
+    background:rgba(154,36,51,.14); border:1px solid var(--crim); color:var(--ice-l); text-align:left;}
+  .leftover b{color:var(--gold-l);}
   .warn{color:#f3c0c0;}
   .sep-list{font-size:16px; color:var(--ice-l); margin:4px 0 0; padding-left:18px;}
   .reset{display:block; margin:22px auto 0; font-family:'Cinzel',serif; letter-spacing:2px;
@@ -180,9 +183,14 @@ function calc(){
   share.className = 'share';
   if(remaining > 0){
     const per = restValue / remaining;
-    share.innerHTML = `<div class="lbl">Each remaining member's share</div>
-      <div class="num">${per.toFixed(2)}</div>
-      <div class="note">${fmtVal(restValue)} total value \u00F7 ${remaining} members</div>`;
+    const floored = Math.floor(per * 2) / 2;            // round DOWN to nearest 0.5
+    const leftover = +(restValue - floored * remaining).toFixed(2);
+    share.innerHTML = `<div class="lbl">Each member's share (rounded down)</div>
+      <div class="num">${fmtVal(floored)}</div>
+      <div class="note">${fmtVal(restValue)} total \u00F7 ${remaining} members = ${per.toFixed(2)}, rounded down to ${fmtVal(floored)}</div>`;
+    if(leftover > 0){
+      share.innerHTML += `<div class="leftover"><b>Leftover: ${fmtVal(leftover)} value.</b> The loot doesn't divide evenly, so there's a fractional remainder that can't be spread cleanly. This one's the host's call: they can keep it, or forgo their own fraction so everyone else's share comes out whole.</div>`;
+    }
   } else {
     share.innerHTML = `<div class="note warn">Every member already won a high-value roll. Split the rest by group call.</div>`;
   }
